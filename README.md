@@ -4,6 +4,16 @@ Split any text for LLM or RAG or Agent.
 
 - text, semantics, token, markdown, code language, custom, etc.
 
+## install
+
+```bash
+pip install .
+
+or
+
+pip install -e .
+```
+
 ## 1. recursive split text
 
 ```python
