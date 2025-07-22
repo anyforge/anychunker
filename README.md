@@ -122,7 +122,6 @@ from sentence_transformers import SentenceTransformer
 
 # Load the model
 model_dir = "Qwen/Qwen3-Embedding-0.6B"
-model_dir = '/Users/qianliy/.cache/modelscope/hub/models/Qwen/Qwen3-Embedding-0___6B'
 model = SentenceTransformer(model_dir)
 
 def emb_model(sentences):
