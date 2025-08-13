@@ -32,7 +32,7 @@ class AnyMarkdownChunker(BaseTextChunker):
         self.headers_to_split_on = sorted(
             splittable_headers.items(), key=lambda split: len(split[0]), reverse=True
         )
-        self.headers_to_split_on_dict = dict([(y,x) for x,y in headers_to_split_on])
+        self.headers_to_split_on_dict = dict([(y,x) for x,y in self.headers_to_split_on])
         self.strip_headers = strip_headers
         self._length_function = length_function
     
