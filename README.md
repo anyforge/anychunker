@@ -4,6 +4,16 @@ Split any text for LLM or RAG or Agent.
 
 - text, semantics, token, markdown, code language, custom, etc.
 
+```
+    _                 ____ _                 _
+   / \   _ __  _   _ / ___| |__  _   _ _ __ | | _____ _ __
+  / _ \ | '_ \| | | | |   | '_ \| | | | '_ \| |/ / _ \ '__|
+ / ___ \| | | | |_| | |___| | | | |_| | | | |   <  __/ |
+/_/   \_\_| |_|\__, |\____|_| |_|\__,_|_| |_|_|\_\___|_|
+               |___/
+
+```
+
 ## install
 
 ```bash
