@@ -4,9 +4,9 @@ from typing import (
     Callable, Optional, Iterable, Any,
     List, Union, Literal
 )
-from .base import (
-    Document, DocumentMetadata, Chunker, 
-    BaseTextChunker, AnySeparators, Language
+from .base import BaseTextChunker,AnySeparators, Language
+from .schemas import (
+    Documents, DocumentMetadata, Chunker
 )
 
 
@@ -28,7 +28,7 @@ def cosine_similarity(a, b):
 class AnySemanticsChunker(BaseTextChunker):
     def __init__(
         self,
-        embedding_model,
+        embedding_model: Optional[Callable[[str], List[str]]] = None,
         sentence_splitter: Optional[Callable[[str], List[str]]] = None,
         distance_function: Optional[Callable[[np.ndarray, np.ndarray], float]] = None,
         buffer_size: Optional[int] = 1,
@@ -111,7 +111,7 @@ class AnySemanticsChunker(BaseTextChunker):
     
     def invoke(self, text: str, **kwargs):
         if not text:
-            return Document()
+            return Documents()
         text_splits = self.sentence_splitter(text)
 
         sentences = self.build_sentence_groups(text_splits)
@@ -131,7 +131,7 @@ class AnySemanticsChunker(BaseTextChunker):
         document_metadata = kwargs.pop("document_metadata", {})
         document_metadata = DocumentMetadata(**document_metadata)
         document_metadata.length = self._length_function(text)
-        doc_result = Document(metadata=document_metadata)
+        doc_result = Documents(metadata=document_metadata)
         chunk_metadata = kwargs.pop("chunk_metadata", {})
 
         index = 0

@@ -1,33 +1,84 @@
+<p align="center">
+  <img src="./images/anychunker_logo.png" style="width: 500px;" alt="Logo">
+</p>
+
 # AnyChunker
 
 Split any text for LLM or RAG or Agent.
 
+Specially supports block-based splitting, keeping Markdown elements intact.
+
 - text, semantics, token, markdown, code language, custom, etc.
-
-```
-    _                 ____ _                 _
-   / \   _ __  _   _ / ___| |__  _   _ _ __ | | _____ _ __
-  / _ \ | '_ \| | | | |   | '_ \| | | | '_ \| |/ / _ \ '__|
- / ___ \| | | | |_| | |___| | | | |_| | | | |   <  __/ |
-/_/   \_\_| |_|\__, |\____|_| |_|\__,_|_| |_|_|\_\___|_|
-               |___/
-
-```
 
 ## install
 
 ```bash
-pip install .
+pip install anychunker
 
 or
 
 pip install -e .
 ```
 
+## 0. special markdown block split
+
+```python
+from anychunker import AnyMarkdownBlockChunker
+
+markdown_document = '''
+dasdasdasda
+# title1
+
+    ## Bar
+# title1-1
+
+    ## Bar-1
+Hi this is Jim
+
+### Boo 
+
+Hi this is Lance 
+
+# title2
+
+## Baz
+\```code
+# 测试
+def test():
+    # 打印
+    print('ok')
+\```
+
+<table>
+    <th>1111
+    </th>
+</table>
+'''
+
+chunker = AnyMarkdownBlockChunker(
+    chunk_size = 100,
+    chunk_overlap = 5,
+)
+
+res = chunker.invoke(markdown_document)
+res.chunks
+
+# Output:
+
+[Chunker(metadata={'block_id': 0, 'chunk_id': 0, 'title': {}, 'headings': {}, 'chunk_parent_id': [], 'chunk_child_id': [], 'block_parent_id': [], 'block_child_id': [1, 2, 3, 4], 'chunk_size': 11, 'chunk_overlap': 100, 'start_pos': 1, 'end_pos': 12}, chunk_id=0, chunk_size=11, start_pos=1, end_pos=12, content='dasdasdasda'),
+ Chunker(metadata={'block_id': 1, 'chunk_id': 0, 'title': {'name': 'title1', 'value': ['title1']}, 'headings': {}, 'chunk_parent_id': [], 'chunk_child_id': [], 'block_parent_id': [0], 'block_child_id': [2, 3, 4], 'chunk_size': 6, 'chunk_overlap': 100, 'start_pos': 27, 'end_pos': 33}, chunk_id=0, chunk_size=6, start_pos=27, end_pos=33, content='## Bar'),
+ Chunker(metadata={'block_id': 2, 'chunk_id': 0, 'title': {'name': 'title1-1', 'value': ['title1-1']}, 'headings': {}, 'chunk_parent_id': [], 'chunk_child_id': [1], 'block_parent_id': [1, 0], 'block_child_id': [3, 4], 'chunk_size': 13, 'chunk_overlap': 100, 'start_pos': 46, 'end_pos': 59}, chunk_id=0, chunk_size=13, start_pos=46, end_pos=59, content='    ## Bar-1\n'),
+ Chunker(metadata={'block_id': 2, 'chunk_id': 1, 'title': {'name': 'title1-1', 'value': ['title1-1']}, 'headings': {}, 'chunk_parent_id': [0], 'chunk_child_id': [], 'block_parent_id': [1, 0], 'block_child_id': [3, 4], 'chunk_size': 14, 'chunk_overlap': 100, 'start_pos': 59, 'end_pos': 73}, chunk_id=1, chunk_size=14, start_pos=59, end_pos=73, content='Hi this is Jim'),
+ Chunker(metadata={'block_id': 3, 'chunk_id': 0, 'title': {'name': 'title1-1', 'value': ['title1-1']}, 'headings': {'name': 'Boo', 'value': ['Boo']}, 'chunk_parent_id': [], 'chunk_child_id': [], 'block_parent_id': [2, 1, 0], 'block_child_id': [4], 'chunk_size': 16, 'chunk_overlap': 100, 'start_pos': 85, 'end_pos': 101}, chunk_id=0, chunk_size=16, start_pos=85, end_pos=101, content='Hi this is Lance'),
+ Chunker(metadata={'block_id': 4, 'chunk_id': 0, 'title': {'name': 'title2', 'value': ['title2']}, 'headings': {'name': 'Baz', 'value': ['Baz']}, 'chunk_parent_id': [], 'chunk_child_id': [1], 'block_parent_id': [3, 2, 1, 0], 'block_child_id': [], 'chunk_size': 53, 'chunk_overlap': 100, 'start_pos': 121, 'end_pos': 174}, chunk_id=0, chunk_size=53, start_pos=121, end_pos=174, content="```code\n# 测试\ndef test():\n    # 打印\n    print('ok')\n```"),
+ Chunker(metadata={'block_id': 4, 'chunk_id': 1, 'title': {'name': 'title2', 'value': ['title2']}, 'headings': {'name': 'Baz', 'value': ['Baz']}, 'chunk_parent_id': [0], 'chunk_child_id': [], 'block_parent_id': [3, 2, 1, 0], 'block_child_id': [], 'chunk_size': 39, 'chunk_overlap': 100, 'start_pos': 176, 'end_pos': 215}, chunk_id=1, chunk_size=39, start_pos=176, end_pos=215, content='<table>\n    <th>1111\n    </th>\n</table>')]
+
+```
+
 ## 1. recursive split text
 
 ```python
-from anychunker.text import AnyTextChunker
+from anychunker import AnyTextChunker
 
 text = """
 # 1111
@@ -94,19 +145,23 @@ model1.invoke(text)
 
 ```python
 ## by language
-from anychunker.base import Language
+from anychunker import Language
 
 model3 = AnyTextChunker.from_language(Language.MARKDOWN,chunk_size = 50, chunk_overlap = 0)
 model3.invoke(text)
 
 
     Document(metadata=DocumentMetadata(created=datetime.datetime(2025, 7, 22, 14, 59, 4, 222919), name='default', topic='default', tag='default', length=70), chunks=[Chunker(metadata={}, chunk_id=0, chunk_size=26, start_pos=1, end_pos=27, content='# 1111\n## 1111.22\ndsdsdsds'), Chunker(metadata={}, chunk_id=1, chunk_size=40, start_pos=29, end_pos=69, content='## 1.4 dsdsdd\ndajajfsdfds\n###### dsdsdsd')])
+
+
+## other language
+from anychunker import AnyCodeChunker
 ```
 
 ## 2. super markdown header split
 
 ```python
-from anychunker.markdown import AnyMarkdownChunker
+from anychunker import AnyMarkdownChunker
 
 text = """
 # 1111
@@ -127,7 +182,7 @@ model4.invoke(text)
 ## 3. Semantics text split
 
 ```python
-from anychunker.semantics import AnySemanticsChunker
+from anychunker import AnySemanticsChunker
 from sentence_transformers import SentenceTransformer
 
 # Load the model

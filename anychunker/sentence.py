@@ -1,8 +1,8 @@
 import re
 from typing import Callable,List, Optional
-from .base import (
-    Document, DocumentMetadata, Chunker, 
-    BaseTextChunker, AnySeparators, Language
+from .base import BaseTextChunker,AnySeparators, Language
+from .schemas import (
+    Documents, DocumentMetadata, Chunker
 )
 
 
@@ -203,11 +203,11 @@ class AnySentenceChunker(BaseTextChunker):
     
     def invoke(self, text: str, **kwargs):
         if not text:
-            return Document()
+            return Documents()
         document_metadata = kwargs.pop("document_metadata", {})
         document_metadata = DocumentMetadata(**document_metadata)
         document_metadata.length = self._length_function(text)
-        doc_result = Document(metadata=document_metadata)
+        doc_result = Documents(metadata=document_metadata)
         chunk_metadata = kwargs.pop("chunk_metadata", {})
         final_chunks = self.enhanced_rule_split(text)
         index = 0

@@ -1,33 +1,43 @@
 [build-system]
-requires = ["setuptools>=45", "wheel"]
+requires = ["setuptools>=77.0.3", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "anychunker"
-version = "1.0.0"
-description = "Split any text for LLM or RAG or Agent. - text, semantics, token, markdown, code language, custom, etc."
-readme = "README.md"
-authors = [
-    {name = "AnyForge"}
-]
+dynamic = ["version"]
 license = {text = "MIT"}
+description = "Split any text for LLM or RAG or Agent.Specially supports block-based splitting, keeping Markdown elements intact."
+readme = "README.md"
 requires-python = ">=3.7"
+keywords = [
+    "LLm",
+    "RAG",
+    "chunker",
+    "block"
+]
 classifiers = [
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
 ]
 dependencies = [
-    "numpy",
+    "numpy>=1.21.6",
     "pydantic",
-    "transformers"
+    "transformers",
 ]
 
+
 [project.urls]
-Homepage = "https://github.com/anyforge/anychunker"
-Repository = "https://github.com/anyforge/anychunker.git"
-Issues = "https://github.com/anyforge/anychunker/issues"
+homepage = "https://github.com/anyforge/anychunker"
+repository = "https://github.com/anyforge/anychunker"
+
+
+[tool.setuptools.dynamic]
+version = { attr = "anychunker.__version__.version" }
 
 [tool.setuptools.packages.find]
-where = ["."]
 include = ["anychunker*"]
+namespaces = false
+
+[tool.setuptools]
+zip-safe = false

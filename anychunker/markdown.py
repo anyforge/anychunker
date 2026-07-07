@@ -4,25 +4,23 @@ from typing import (
     List, Tuple, Union, Literal
 )
 from .text import AnyTextChunker
-from .base import (
-    Document, DocumentMetadata, Chunker, 
-    BaseTextChunker, AnySeparators, Language
+from .base import BaseTextChunker,AnySeparators, Language
+from .schemas import (
+    Documents, DocumentMetadata, Chunker
 )
 
 
 class AnyMarkdownChunker(BaseTextChunker):
     DEFAULT_HEADER_KEYS = {
-        "#": "Header 1",
-        "##": "Header 2",
-        "###": "Header 3",
-        "####": "Header 4",
-        "#####": "Header 5",
-        "######": "Header 6",
+        "#": "Header-1",
+        "##": "Header-2",
+        "###": "Header-3",
     }
     def __init__(
         self,
         headers_to_split_on: Union[List[Tuple[str, str]], None] = None,
         strip_headers: bool = True, 
+        return_each_line: bool = False,
         length_function: Callable[[str], int] = len
     ):
         if headers_to_split_on:
@@ -34,6 +32,7 @@ class AnyMarkdownChunker(BaseTextChunker):
         )
         self.headers_to_split_on_dict = dict([(y,x) for x,y in self.headers_to_split_on])
         self.strip_headers = strip_headers
+        self.return_each_line = return_each_line
         self._length_function = length_function
     
     @classmethod
@@ -50,7 +49,8 @@ class AnyMarkdownChunker(BaseTextChunker):
         in_code_block = False
         opening_fence = ""
         for line in lines:
-            stripped_line = line.strip()
+            # stripped_line = line.strip()
+            stripped_line = line
             stripped_line = "".join(filter(str.isprintable, stripped_line))
             if not in_code_block:
                 # Exclude inline code spans
@@ -141,21 +141,70 @@ class AnyMarkdownChunker(BaseTextChunker):
                     "metadata": current_metadata,
                 }
             )
+        if self.return_each_line:
+            final_chunks = []
+            for chunk in lines_with_metadata:
+                final_chunks.append({
+                    "content": chunk["content"],
+                    "metadata": chunk["metadata"]
+                })
+        else:
+            final_chunks = self.aggregate_lines_to_chunks(lines_with_metadata)
+        return final_chunks  
+    
+    def aggregate_lines_to_chunks(self, lines: list) -> list[dict]:
+        """Combine lines with common metadata into chunks.
+
+        Args:
+            lines: Line of text / associated header metadata
+        """
+        aggregated_chunks = []
+
+        for line in lines:
+            if (
+                aggregated_chunks
+                and aggregated_chunks[-1]["metadata"] == line["metadata"]
+            ):
+                # If the last line in the aggregated list
+                # has the same metadata as the current line,
+                # append the current content to the last lines's content
+                aggregated_chunks[-1]["content"] += "  \n" + line["content"]
+            elif (
+                aggregated_chunks
+                and aggregated_chunks[-1]["metadata"] != line["metadata"]
+                # may be issues if other metadata is present
+                and len(aggregated_chunks[-1]["metadata"]) < len(line["metadata"])
+                and aggregated_chunks[-1]["content"].split("\n")[-1][0] == "#"
+                and not self.strip_headers
+            ):
+                # If the last line in the aggregated list
+                # has different metadata as the current line,
+                # and has shallower header level than the current line,
+                # and the last line is a header,
+                # and we are not stripping headers,
+                # append the current content to the last line's content
+                aggregated_chunks[-1]["content"] += "  \n" + line["content"]
+                # and update the last line's metadata
+                aggregated_chunks[-1]["metadata"] = line["metadata"]
+            else:
+                # Otherwise, append the current line to the aggregated list
+                aggregated_chunks.append(line)
+                
         final_chunks = []
-        for chunk in lines_with_metadata:
+        for chunk in aggregated_chunks:
             final_chunks.append({
                 "content": chunk["content"],
                 "metadata": chunk["metadata"]
             })
-        return final_chunks  
-    
+
+        return final_chunks
     def invoke(self, text: str, **kwargs):
         if not text:
-            return Document()
+            return Documents()
         document_metadata = kwargs.pop("document_metadata", {})
         document_metadata = DocumentMetadata(**document_metadata)
         document_metadata.length = self._length_function(text)
-        doc_result = Document(metadata=document_metadata)
+        doc_result = Documents(metadata=document_metadata)
         chunk_metadata = kwargs.pop("chunk_metadata", {})
         final_chunks = self.recursive_split(text)
         index = 0

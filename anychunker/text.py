@@ -3,9 +3,9 @@ from typing import (
     Callable, Optional, Iterable, Any,
     List, Union, Literal
 )
-from .base import (
-    Document, DocumentMetadata, Chunker, 
-    BaseTextChunker, AnySeparators, Language
+from .base import BaseTextChunker,AnySeparators, Language
+from .schemas import (
+    Documents, DocumentMetadata, Chunker
 )
 
 
@@ -30,8 +30,17 @@ class AnyTextChunker(BaseTextChunker):
         self._keep_separator = keep_separator
         self._is_separator_regex = is_separator_regex
         self._strip_whitespace = strip_whitespace 
-        self._separators = separators or ["\n\n", "\n", " ", ""]
-        
+        ## 英文默认
+        # self._separators = separators or ["\n\n", "\n", " ", ""]
+        ## 中文默认
+        self._separators = separators or [
+            "\n\n",          # 段落之间（优先）
+            "\n",            # 换行
+            "。",            # 句号（完整句子）
+            " ",             # 空格（中英文混排时有用）
+            "",              # 最后 fallback
+        ]
+            
     @classmethod
     def from_tokenizer(cls, pretrained_model_name_or_path, *inputs, **kwargs):
         from transformers import AutoTokenizer
@@ -204,11 +213,11 @@ class AnyTextChunker(BaseTextChunker):
 
     def invoke(self, text: str, **kwargs):
         if not text:
-            return Document()
+            return Documents()
         document_metadata = kwargs.pop("document_metadata", {})
         document_metadata = DocumentMetadata(**document_metadata)
         document_metadata.length = self._length_function(text)
-        doc_result = Document(metadata=document_metadata)
+        doc_result = Documents(metadata=document_metadata)
         chunk_metadata = kwargs.pop("chunk_metadata", {})
         final_chunks = self.recursive_split(text, self._separators)
         index = 0
