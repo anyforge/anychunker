@@ -2,6 +2,12 @@
   <img src="./images/anychunker_logo.png" style="width: 500px;" alt="Logo">
 </p>
 
+<p align="center">
+    <a href="https://pypi.org/project/anychunker/"><img src="https://img.shields.io/pypi/v/anychunker"></a>
+    <a href="https://pypi.org/project/anychunker/"><img src="https://img.shields.io/pypi/pyversions/anychunker"></a>
+    <a href="https://deepwiki.com/anyforge/anychunker/"><img src="https://deepwiki.com/badge.svg"></a>
+</p>
+
 # AnyChunker
 
 Split any text for LLM or RAG or Agent.
