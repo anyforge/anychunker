@@ -3,6 +3,9 @@
 </p>
 
 <p align="center">
+    <a href="https://clawhub.ai/anyforge/skills/anychunker-skills" target="_blank"><img alt="Static Badge" src="https://img.shields.io/badge/%F0%9F%A6%9E%20ClawHub-anychunker-f39f37"></a>
+    <a href="https://skillhub.cn/skills/anychunker-skills" target="_blank"><img alt="Static Badge" src="https://img.shields.io/badge/SkillHub-anychunker-f39f37"></a>
+    <a href="https://www.modelscope.cn/skills/anyforge/anychunker-skills/" target="_blank"><img alt="Static Badge" src="https://img.shields.io/badge/ModelScopeSkills-anychunker-f39f37"></a>
     <a href="https://pypi.org/project/anychunker/"><img src="https://img.shields.io/pypi/v/anychunker"></a>
     <a href="https://pypi.org/project/anychunker/"><img src="https://img.shields.io/pypi/pyversions/anychunker"></a>
     <a href="https://deepwiki.com/anyforge/anychunker/"><img src="https://deepwiki.com/badge.svg"></a>
